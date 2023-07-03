@@ -9,6 +9,7 @@ import Product from "@/components/Product";
 import ErrorAlert from "@/components/alerts/ErrorAlert";
 import LoadingAlert from "@/components/alerts/LoadingAlert";
 import SuccessAlert from "@/components/alerts/SuccessAlert";
+import { toast } from "react-toastify";
 // Define the RandomProduct component
 const RandomProductModal = () => {
   // Use the useContractCall hook to read how many products are in the marketplace contract
@@ -27,6 +28,8 @@ const RandomProductModal = () => {
   const [showProduct, setShowProduct] = useState(false);
   const [productId, setProductId] = useState(0)
   const [loadingMessage, setLoadingMessage] = useState("Please wait ...")
+
+  const {refetch} : any = useContractCall("readProduct", [productId], true);
   
   // Define a function to clear the error, success and loading states
   const clear = () => {
@@ -35,6 +38,7 @@ const RandomProductModal = () => {
     setLoading("");
   };
 
+  var recursiveCalls = 0
   const loadingRandom = async () => {
     setShowProduct(false)
     if (productLength == 0) {
@@ -42,10 +46,24 @@ const RandomProductModal = () => {
     } else {
       // loading 2 seconds
       let timer = setTimeout(() => setShowProduct(true), 2 * 1000);
-      setProductId(Math.floor(Math.random() * productLength))
-
+      const productId = Math.floor(Math.random() * productLength);
+      setProductId(productId);
+      var producttx = await refetch();
+      // Limit the number of recursive calls to 20
+      if (recursiveCalls == 20) {
+        toast.warn("Cannot find valid product. Please try again or add more product to use this functionality");
+        setVisible(false)
+      }
+      // Confirm that a product is valid and limit the number of recursive calls
+      /** Note: The lesser the number of recursive calls, the less accurate this functionality */
+      if (Number(producttx.data[0]) == 0 && recursiveCalls < 20) {
+        recursiveCalls++
+        await loadingRandom();
+        return;
+      } 
       return () => {
         clearTimeout(timer);
+        recursiveCalls = 0
       };
     }
   }
