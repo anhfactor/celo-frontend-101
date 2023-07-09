@@ -45,6 +45,10 @@ const DeleteProductModal = ({ id }: Props) => {
         success: "Product deleted successfully",
         error: "Something went wrong. Try again.",
       });
+      // Delay for 2 seconds before reloading
+      setTimeout(() => {
+        window.location.reload()
+      }, 4**1000);
       // Display an error message if something goes wrong
     } catch (e: any) {
       console.log({ e });

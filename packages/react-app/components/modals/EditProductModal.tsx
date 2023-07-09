@@ -47,17 +47,48 @@ const EditProductModal = ({ id, product }: Product) => {
   const [debouncedProductLocation] = useDebounce(productLocation, 500);
   const [loading, setLoading] = useState("");
 
+  // Validate a url
+  function isValidUrl(url:string) {
+    let isValid = false;
+
+    try {
+      const parsedUrl = new URL(url);
+      isValid = true;
+    } catch (error) {
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
   // Check if all the input fields are filled
-  const isComplete =
-    productName &&
-    productPrice &&
-    productImage &&
-    productLocation &&
-    productDescription;
+   const isComplete = () => {
+    if (productName.length < 2) {
+      toast.warn("Please enter valid product name (2 characters or more")
+      return false;
+    }
+    if (Number(productPrice) < 1) {
+      toast.warn("Please enter a valid product price (> 0)")
+      return false;
+    }
+    if (!isValidUrl(productImage)) {
+      toast.warn("Please enter a valid image url")
+      return false;
+    }
+    if (productLocation.length < 2) {
+      toast.warn("Please enter a valid product location (2 characters or more)")
+      return false;
+    }
+    if (productDescription.split(" ").length < 2) {
+      toast.warn("Please enter a valid product description (2 words or more)")
+      return false;
+    }
+    return true
+  }
 
   // Convert the product price to wei
   const productPriceInWei = ethers.utils.parseEther(
-    debouncedProductPrice.toString()
+    `${debouncedProductPrice.toString() || 0}`
   );
 
   // Use the useContractSend hook to use our editProduct function on the marketplace contract and add a product to the marketplace
@@ -76,7 +107,7 @@ const EditProductModal = ({ id, product }: Product) => {
       throw "Failed to edit product";
     }
     setLoading("Editing...");
-    if (!isComplete) throw new Error("Please fill all fields");
+    if (!isComplete()) throw new Error("Please fill all fields");
     // Edit the product by calling the editProduct function on the marketplace contract
     const purchaseTx = await editProductFunc();
     setLoading("Waiting for confirmation...");
