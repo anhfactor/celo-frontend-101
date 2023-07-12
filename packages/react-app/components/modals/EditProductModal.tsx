@@ -62,9 +62,9 @@ const EditProductModal = ({ id, product }: Product) => {
   }
 
   // Check if all the input fields are filled
-   const isComplete = () => {
-    if (productName.length < 2) {
-      toast.warn("Please enter valid product name (2 characters or more")
+  const isComplete = () => {
+    if (productName == null || productName.trim() == '' || productName.length < 2) {
+      toast.warn("Please enter valid product name (2 characters or more & not null or only whitespace")
       return false;
     }
     if (Number(productPrice) < 1) {
@@ -75,11 +75,11 @@ const EditProductModal = ({ id, product }: Product) => {
       toast.warn("Please enter a valid image url")
       return false;
     }
-    if (productLocation.length < 2) {
+    if (productLocation == null || productLocation.trim() == '' || productLocation.length < 2) {
       toast.warn("Please enter a valid product location (2 characters or more)")
       return false;
     }
-    if (productDescription.split(" ").length < 2) {
+    if (productDescription == null || productDescription.trim() == '' || productDescription.length < 2) {
       toast.warn("Please enter a valid product description (2 words or more)")
       return false;
     }
