@@ -9,17 +9,8 @@ import type { AppProps } from "next/app";
 
 // Import the connectorsForWallets function to create a list of wallets to connect to. 
 // Import the RainbowKitProvider component to wrap the app with.
-import {
-  connectorsForWallets,
-  RainbowKitProvider
-} from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
-// Import three different wallets connectors from the RainbowKit package.
-import {
-  metaMaskWallet,
-  omniWallet,
-  walletConnectWallet
-} from "@rainbow-me/rainbowkit/wallets";
 
 // Import configureChains, createClient, and WagmiConfig from the Wagmi package to configure the Wagmi client.
 import { configureChains, createClient, WagmiConfig } from "wagmi";
@@ -28,7 +19,7 @@ import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 // Import known recommended CELO wallets
-import { Valora, CeloWallet, CeloDance } from "@celo/rainbowkit-celo/wallets";
+import celoGroups from "@celo/rainbowkit-celo/lists";
 
 // Import CELO chain information
 import { Alfajores, Celo } from "@celo/rainbowkit-celo/chains";
@@ -44,27 +35,17 @@ const { chains, provider } = configureChains(
   [jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }) })]
 );
 
-// Create the list of wallets to connect to.
-const connectors = connectorsForWallets([
-  {
-    groupName: "Recommended with CELO",
-    wallets: [
-      Valora({ chains }),
-      CeloWallet({ chains }),
-      CeloDance({ chains }),
-      metaMaskWallet({ chains }),
-      omniWallet({ chains }),
-      walletConnectWallet({ chains }),
-    ],
-  },
-]);
+const connectors = celoGroups({
+  chains,
+});
 
 // Create the Wagmi client.
 const wagmiClient = createClient({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
-  provider,
+  provider
 });
+
 
 // Create and export the App component wrapped with the RainbowKitProvider and WagmiConfig.
 function App({ Component, pageProps }: AppProps) {

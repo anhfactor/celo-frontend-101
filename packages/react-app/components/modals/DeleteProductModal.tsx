@@ -27,10 +27,10 @@ const DeleteProductModal = ({ id }: Props) => {
     }
     setLoading("Deleting...");
     // Delete the product by calling the deleteProduct function on the marketplace contract
-    const purchaseTx = await deleteProductFunc();
+    const deleteTx = await deleteProductFunc();
     setLoading("Waiting for confirmation...");
     // Wait for the transaction to be mined
-    await purchaseTx.wait();
+    await deleteTx.wait();
     // Close the modal and clear the input fields after the product is added to the marketplace
     setVisible(false);
   };
